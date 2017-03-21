@@ -57,19 +57,19 @@ public class AccelerometerEventListener implements SensorEventListener {
             if(state == myState.DETERMINED) {       // We've figured out which state we're in within 30 samples
                 if (signature == mySig.SIG_B) {
                     instanceOutput.setText("LEFT");
-                    MyGL.setDirection(GameLoop.myDirection.LEFT);
+                    MyGL.setDirection(GameLoop.eDir.LEFT);
                 }
                 else if (signature == mySig.SIG_A){
                     instanceOutput.setText("RIGHT");
-                    MyGL.setDirection(GameLoop.myDirection.RIGHT);
+                    MyGL.setDirection(GameLoop.eDir.RIGHT);
                 }
                 else if (signature == mySig.SIG_C){
                     instanceOutput.setText("UP");
-                    MyGL.setDirection(GameLoop.myDirection.UP);
+                    MyGL.setDirection(GameLoop.eDir.UP);
                 }
                 else if (signature == mySig.SIG_D){
                     instanceOutput.setText("DOWN");
-                    MyGL.setDirection(GameLoop.myDirection.DOWN);
+                    MyGL.setDirection(GameLoop.eDir.DOWN);
                 }
                 else
                     instanceOutput.setText("UNDETERMINED");

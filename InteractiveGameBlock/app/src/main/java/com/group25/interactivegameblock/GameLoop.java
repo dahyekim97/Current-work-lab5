@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.TimerTask;
@@ -36,7 +37,7 @@ public class GameLoop extends TimerTask{
     public static final int RIGHT_BOUNDARY = LEFT_BOUNDARY + 3*SLOT_ISOLATION;
     public static final int DOWN_BOUNDARY = UP_BOUNDARY + 3*SLOT_ISOLATION;
 
-    public LinkedList<GameBlock> myGBList;
+    public static LinkedList<GameBlock> myGBList;
 
     private Random myRandomGen;
 
@@ -90,11 +91,16 @@ public class GameLoop extends TimerTask{
 
     //This method is used by the Accelerometer Handler to change the game direction
     public void setDirection(eDir targetDir){
-        if(myDirection != targetDir) {
+        Log.d("UUU", "called: ");
+
+//        if(myDirection != targetDir) {
             myDirection = targetDir;
-            for(GameBlock gb : myGBList)
+            for(GameBlock gb : myGBList) {
                 gb.setDestination(targetDir);
-        }
+                Log.d("ifstate", "called: ");
+
+            }
+//        }
         createBlock();
 
     }
@@ -115,20 +121,124 @@ public class GameLoop extends TimerTask{
 
     }
 
+    private int getIndexOfBlock(int x, int y){
+        int temp = 0;
+        for(GameBlock gb : myGBList){
+            if(gb.getCoordinate()[1] == y*GameLoop.SLOT_ISOLATION && gb.getCoordinate()[0]== x*GameLoop.SLOT_ISOLATION){
+                temp = myGBList.indexOf(gb);
+            }
+        }
+        return  temp;
+    }
+
+    private void removeThings(){
+
+
+
+        for(Iterator<GameBlock> iter = myGBList.iterator(); iter.hasNext();) {
+            GameBlock data = iter.next();
+            if (data.toBeRemoved) {
+                iter.remove();
+            }
+        }
+
+        }
+
+
+
+
 
     public void run(){
 
         thisActivity.runOnUiThread(
                 new Runnable() {
                     public void run() {
+/*
+                        //initializing the array
+                        int tempArray[][] = new int[4][4];
+                        for(int i = 0 ; i < 4; i++){
+                            for(int j = 0 ; j < 4 ; j++){
+                                tempArray[i][j]=0;
+                            }
+                        }
+
+                        //assign the values to the int array
+                        for(int i = 0 ; i < 4; i++) {
+                            for (int j = 0; j < 4; j++) {
+                                for (GameBlock gb : myGBList) {
+                                    int[] myCoords = gb.getCoordinate();
+                                    if (myCoords[0]/GameLoop.SLOT_ISOLATION == i) {
+                                        if (myCoords[1]/GameLoop.SLOT_ISOLATION == j){
+                                            tempArray[i][j] = Integer.parseInt("" + gb.getTextOfTV());
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+
+                        switch(myDirection){
+
+                            case LEFT:
+
+                                for(int j = 0 ; j < 4; j++) {
+                                    for (int i = 0; i < 4; i++) {
+
+                                            //when it is not empty block, it should move
+                                            if (tempArray[i][j] > 0){
+                                                myGBList.get(getIndexOfBlock(i,j)).move();
+                                                }
+
+                                        }
+                                    }
+
+
+                                break;
+                            case RIGHT:
+                                for(int j = 3 ; j >= 0; j--) {
+                                    for (int i = 3; i >= 0; i--) {
+
+                                        //when it is not empty block, it should move
+                                        if (tempArray[i][j] > 0){
+                                            myGBList.get(getIndexOfBlock(i,j)).move();
+                                        }
+
+                                    }
+                                }
+                                break;
+                            case UP:
+                                for(int i = 0 ; i < 4; i++) {
+                                    for (int j = 0; j < 4; j++) {
+
+                                        //when it is not empty block, it should move
+                                        if (tempArray[i][j] > 0){
+                                            myGBList.get(getIndexOfBlock(i,j)).move();
+                                        }
+                                    }
+                                }
+                                break;
+                            case DOWN:
+                                for(int i = 3 ; i >= 0; i--) {
+                                    for (int j = 3; j >= 0; j--) {
+                                        //when it is not empty block, it should move
+                                        if (tempArray[i][j] > 0){
+                                            myGBList.get(getIndexOfBlock(i,j)).move();
+                                        }
+                                    }
+                                }
+                                break;
+*/
+
                         for (GameBlock gb : myGBList) {
-                            Log.d("AAA", "AAA is called");
 
                             gb.move();
                         }
-                    }
-                }
-        );
-    }
+                  //  }
 
+                        removeThings();
+
+                    }}
+        );
+
+    }
 }
