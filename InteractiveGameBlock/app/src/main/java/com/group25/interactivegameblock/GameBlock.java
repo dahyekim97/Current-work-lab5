@@ -30,16 +30,18 @@ public class GameBlock extends GameBlockTemplate {
     private TextView myTV;
     private int blockNumber;
 
-    private int myVelocity;
+    public int myVelocity;
     private GameLoop.eDir targetDirection;
 
     public boolean toBeRemoved = false;
+
+    private RelativeLayout myRL;
 
     public GameBlock(Context gbCTX, RelativeLayout gbRL, int coordX, int coordY, GameLoop gbGL){
 
         super(gbCTX);
         this.setImageResource(R.drawable.gameblock);
-
+        this.myRL = gbRL;
         this.setX(coordX);
         this.setY(coordY);
         this.setScaleX(IMAGE_SCALE);
@@ -82,6 +84,13 @@ public class GameBlock extends GameBlockTemplate {
         int[] thisCoord = new int[2];
         thisCoord[0] = myCoordX;
         thisCoord[1] = myCoordY;
+        return thisCoord;
+    }
+
+    public int[] getTargetCoordinate(){
+        int[] thisCoord = new int[2];
+        thisCoord[0] = targetCoordX;
+        thisCoord[1] = targetCoordY;
         return thisCoord;
     }
 
@@ -145,24 +154,6 @@ public class GameBlock extends GameBlockTemplate {
 
                 mergingAlgorithm(currentDir,tempArray,currentX,currnetY);
 
-
-                testCoord = GameLoop.RIGHT_BOUNDARY;
-                numOfOccupants = 0;
-                slotCount = 0;
-//                while(testCoord != myCoordX){
-//
-//                    Log.d("Game Block Test Point", String.format("%d", testCoord));
-//
-//                    if(myGL.isOccupied(testCoord, myCoordY)){
-//                        numOfOccupants++;
-//                    }
-//                    slotCount++ ;
-//                    testCoord -= GameLoop.SLOT_ISOLATION;
-//                }
-
-
-
-
                 Log.d("Game Block Report: ", String.format("Target X Coord: %d", targetCoordX));
 
                 break;
@@ -189,13 +180,10 @@ public class GameBlock extends GameBlockTemplate {
 
                 mergingAlgorithm(currentDir,tempArray,currentX,currnetY);
 
-
-
-
-
-
                 break;
+
             default:
+
                 break;
         }
 
@@ -294,6 +282,7 @@ public class GameBlock extends GameBlockTemplate {
 
 
     //this method sets the target destination
+    //and mark the block which should be removed
     public void mergingAlgorithm(char dir, int[] array, int currentBlockX, int currentBlockY){
         int BlockCount=0;
         int slotCount = 0;
@@ -301,22 +290,20 @@ public class GameBlock extends GameBlockTemplate {
 
         switch (dir){
             case 'L':
-                Log.d("HHH", "called " );
 
                 //if the current block is not at the left edge, it can move, so we are checking if it's at the left edge.
                 if(currentBlockX != 0) {
-                    //if the very left of the current block has the same number, combine them
 
-                    //it checks before the current block if there's any block and check if that block has the same number
+                    //adgacentBlockIndexforArray gets the index in array of the nearest block to the current block
                     for(int i = 0 ; i < currentBlockX ; i++){
                         if(array[i]>0){
                             adjacentBlockIndexforArray = i;
                         }
                     }
+                    //check if the nearest block and the current block has the same number
                     if (array[currentBlockX] == array[adjacentBlockIndexforArray]) {
-                        //among the two same number adjacent blocks, the left one becomes twice the value and the right one stores the other blcok adjacent to it.
+
                         int adjacentBlockIndex = this.getIndexOfBlock(adjacentBlockIndexforArray,currentBlockY);
-                        int currentBlockIndex = this.getIndexOfBlock(currentBlockX,currentBlockY);
                         int numberInBlock = Integer.parseInt(""+myGL.myGBList.get(adjacentBlockIndex).myTV.getText());
 
                         myGL.myGBList.get(adjacentBlockIndex).myTV.setText(""+numberInBlock*2);
@@ -324,31 +311,14 @@ public class GameBlock extends GameBlockTemplate {
 
 
                     }else{
-//                        if the left of the current block has not the same number, just move, don't combine them
-//                        to do so, calculate the number of blocks exists to the left of the current block and the number of slots total to the left of current block
                         for(int i =0; i < currentBlockX; i++){
-                            Log.d("YYY", "currentBlockX "+currentBlockX);
-
-                            Log.d("TTT", "array["+i+"]"+ +array[i]);
-
                             if(array[i] > 0){
-                                Log.d("GGG", "?? ");
-
                                 // this means there exists a block
                                 BlockCount++;
                             }
                             slotCount++;
                         }
 
-//                        while(currentBlockX != myCoordX/GameLoop.SLOT_ISOLATION){
-//
-//
-//                    if(myGL.isOccupied(testCoord, myCoordY)){
-//                        BlockCount++;
-//                    }
-//                    slotCount++ ;
-//                    testCoord += GameLoop.SLOT_ISOLATION;
-//                }
 
                         targetCoordX = (myCoordX - (GameLoop.LEFT_BOUNDARY+((slotCount-BlockCount)*GameLoop.SLOT_ISOLATION)));
 
@@ -360,24 +330,28 @@ public class GameBlock extends GameBlockTemplate {
 
                     }
                 }
-
-
                 break;
-            case 'R':
 
+
+
+            case 'R':
                 //if the current block is not at the right edge, it can move, so we are checking if it's at the left edge.
                 if(currentBlockX != 3) {
-                    //if the very right of the current block has the same number, combine them
-                    if (array[currentBlockX] == array[currentBlockX + 1]) {
-                        //among the two same number adjacent blocks, the left one becomes twice the value and the right one stores the other blcok adjacent to it.
 
-                        int currentBlockIndex = this.getIndexOfBlock(currentBlockX,currentBlockY);
-                        int adjacentBlockIndex = this.getIndexOfBlock(currentBlockX+1,currentBlockY);
+                    //adgacentBlockIndexforArray gets the index in array of the nearest block to the current block
+                    for(int i = 3 ; i > currentBlockX ; i--){
+                        if(array[i]>0){
+                            adjacentBlockIndexforArray = i;
+                        }
+                    }
+
+                    //check if the nearest block and the current block has the same number
+                    if (array[currentBlockX] == array[adjacentBlockIndexforArray]) {
+                        int adjacentBlockIndex = this.getIndexOfBlock(adjacentBlockIndexforArray,currentBlockY);
                         int numberInBlock = Integer.parseInt(""+myGL.myGBList.get(adjacentBlockIndex).myTV.getText());
 
                         myGL.myGBList.get(adjacentBlockIndex).myTV.setText(""+numberInBlock*2);
-                        myGL.myGBList.remove(currentBlockIndex);
-
+                        toBeRemoved = true;
 
                     }else{
                         //if the left of the current block has not the same number, just move, don't combine them
@@ -401,23 +375,26 @@ public class GameBlock extends GameBlockTemplate {
                 break;
             case 'U':
 
-                //if the current block is not at the right edge, it can move, so we are checking if it's at the left edge.
+                //if the current block is not at the upper edge, it can move, so we are checking if it's at the left edge.
                 if(currentBlockY != 0) {
-                    //if the very right of the current block has the same number, combine them
-                    if (array[currentBlockY] == array[currentBlockY - 1]) {
-                        //among the two same number adjacent blocks, the left one becomes twice the value and the right one stores the other blcok adjacent to it.
 
-                        int currentBlockIndex = this.getIndexOfBlock(currentBlockX,currentBlockY);
-                        int adjacentBlockIndex = this.getIndexOfBlock(currentBlockX,currentBlockY-1);
+                    //adgacentBlockIndexforArray gets the index in array of the nearest block to the current block
+                    for(int i = 0 ; i < currentBlockY ; i++){
+                        if(array[i]>0){
+                            adjacentBlockIndexforArray = i;
+                        }
+                    }
+                    //check if the nearest block and the current block has the same number
+                    if (array[currentBlockY] == array[adjacentBlockIndexforArray]) {
+
+                        int adjacentBlockIndex = this.getIndexOfBlock(currentBlockX,adjacentBlockIndexforArray);
                         int numberInBlock = Integer.parseInt(""+myGL.myGBList.get(adjacentBlockIndex).myTV.getText());
 
                         myGL.myGBList.get(adjacentBlockIndex).myTV.setText(""+numberInBlock*2);
-                        myGL.myGBList.remove(currentBlockIndex);
-
+                        toBeRemoved = true;
 
                     }else{
-                        //if the left of the current block has not the same number, just move, don't combine them
-                        //to do so, calculate the number of blocks exists to the left of the current block and the number of slots total to the left of current block
+
                         for(int i = 0; i < currentBlockY; i++){
                             if(array[i] > 0){
                                 // this means there exists a block
@@ -436,16 +413,21 @@ public class GameBlock extends GameBlockTemplate {
 
                 //if the current block is not at the right edge, it can move, so we are checking if it's at the left edge.
                 if(currentBlockY != 3) {
-                    //if the very right of the current block has the same number, combine them
-                    if (array[currentBlockY] == array[currentBlockY + 1]) {
-                        //among the two same number adjacent blocks, the left one becomes twice the value and the right one stores the other blcok adjacent to it.
 
-                        int currentBlockIndex = this.getIndexOfBlock(currentBlockX,currentBlockY);
-                        int adjacentBlockIndex = this.getIndexOfBlock(currentBlockX,currentBlockY+1);
+                    //adgacentBlockIndexforArray gets the index in array of the nearest block to the current block
+                    for(int i = 3 ; i > currentBlockY ; i--){
+                        if(array[i]>0){
+                            adjacentBlockIndexforArray = i;
+                        }
+                    }
+                    //check if the nearest block and the current block has the same number
+                    if (array[currentBlockY] == array[adjacentBlockIndexforArray]) {
+
+                        int adjacentBlockIndex = this.getIndexOfBlock(currentBlockX,adjacentBlockIndexforArray);
                         int numberInBlock = Integer.parseInt(""+myGL.myGBList.get(adjacentBlockIndex).myTV.getText());
 
                         myGL.myGBList.get(adjacentBlockIndex).myTV.setText(""+numberInBlock*2);
-                        myGL.myGBList.remove(currentBlockIndex);
+                        toBeRemoved = true;
 
 
                     }else{
@@ -480,6 +462,10 @@ public class GameBlock extends GameBlockTemplate {
         return  temp;
     }
 
+    public void destroyMe(){
+        myRL.removeView(myTV);
+        myRL.removeView(this);
+    }
 
 
 }
